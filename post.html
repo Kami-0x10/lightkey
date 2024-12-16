@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="apple-touch-icon" href="./ico/global.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="./ico/global.ico">
+    <!-- Windowsタイル用アイコン -->
+    <meta name="msapplication-TileImage" content="./ico/global.ico">
+    <meta name="msapplication-TileColor" content="#ffffff"> <!-- タイルの背景色 -->
+    <link rel="icon" href="./ico/global.ico">
+    <script src="./js/json2.js"></script> <!-- JSONのポリフィルを追加 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新しい投稿 - Simpdon クライアント</title>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>新しい投稿</h1>
+        <div class="form">
+            <textarea id="content" placeholder="投稿内容を入力してください"></textarea>
+            <a href="javascript:void(0);" id="post-btn" class="button">投稿</a>
+            <!-- 追加: timeline.htmlに戻るボタン -->
+            <a href="timeline.html" class="button">タイムラインに戻る</a>
+        </div>
+    </div>
+
+    <iframe id="hidden-frame" name="hidden-frame" style="display:none;"></iframe>
+
+    <script>
+        function getCookie(name) {
+            var nameEq = name + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i].replace(/^\s+/, ''); // 前後の空白を削除
+                if (c.indexOf(nameEq) === 0) return c.substring(nameEq.length, c.length);
+            }
+            return "";
+        }
+
+        // 投稿ボタンがクリックされたとき
+        document.getElementById('post-btn').onclick = function () {
+            var content = document.getElementById('content').value.replace(/^\s+|\s+$/g, '');
+
+            if (!content) {
+                alert('投稿内容を入力してください');
+                return;
+            }
+
+            var instanceUrl = getCookie('instanceUrl');
+            var accessToken = getCookie('accessToken');
+
+            if (!instanceUrl || !accessToken) {
+                alert('ログイン情報が見つかりません');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Misskeyの投稿用APIエンドポイント
+            var apiUrl = instanceUrl + '/api/notes/create';
+
+            // リクエストを作成
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "https://cors-0x10.online/" + apiUrl, true); // プロキシURLをリクエスト先として指定
+
+            xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
+            xhr.setRequestHeader("Content-Type", "application/json"); // JSON形式に変更
+
+            // リクエスト送信時の処理
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert('投稿が送信されました');
+                        window.location.href = "timeline.html";  // 投稿後、タイムラインに戻る
+                    } else {
+                        alert('投稿の送信に失敗しました');
+                    }
+                }
+            };
+
+            // リクエストボディのデータをJSON形式で送信
+            var params = JSON.stringify({
+                text: content
+            });
+
+            xhr.send(params); // CORSプロキシを経由して送信
+        };
+    </script>
+</body>
+</html>
