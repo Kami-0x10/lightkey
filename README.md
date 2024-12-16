@@ -1,6 +1,5 @@
 # simpkey-v2
 多分ssl対応ブラウザならどんなものでも投稿、閲覧できるmisskeyクライアントアプリ<br>
-なんとiOS6対応!!!<br>
 https://kami-0x10.github.io/simpkey-v2/login.html<br>
 
 ## License
